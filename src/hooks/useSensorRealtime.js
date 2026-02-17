@@ -1,6 +1,5 @@
 import { useEffect, useReducer } from 'react'
-import { LIMITS_STORAGE_KEY, LIMITS_URL, WS_URL } from '../config/sensorsConfig'
-import { parseLimits } from '../utils/sensorUtils'
+import { SENSOR_CONFIG_STORAGE_KEY, SENSOR_CONFIG_URL, WS_URL } from '../config/sensorsConfig'
 import { initialSensorStore, sensorReducer, SENSOR_ACTIONS } from '../redux/sensorReducer'
 
 export function useSensorRealtime() {
@@ -9,33 +8,32 @@ export function useSensorRealtime() {
   useEffect(() => {
     let isCancelled = false
 
-    async function loadLimits() {
-      const cached = localStorage.getItem(LIMITS_STORAGE_KEY)
+    async function loadInitialConfig() {
+      const cached = localStorage.getItem(SENSOR_CONFIG_STORAGE_KEY)
 
       if (cached) {
         try {
-          const cachedLimits = JSON.parse(cached)
+          const cachedConfig = JSON.parse(cached)
           if (!isCancelled) {
-            dispatch({ type: SENSOR_ACTIONS.SET_LIMITS, payload: cachedLimits })
+            dispatch({ type: SENSOR_ACTIONS.SET_INITIAL_CONFIG, payload: cachedConfig })
           }
           return
         } catch (error) {
-          console.warn('Cache de límites inválida, se recargará desde API:', error)
+          console.warn('Cache de configuración inválida, se recargará desde API:', error)
         }
       }
 
-      const response = await fetch(LIMITS_URL)
+      const response = await fetch(SENSOR_CONFIG_URL)
       const payload = await response.json()
-      const fetchedLimits = parseLimits(payload)
-      localStorage.setItem(LIMITS_STORAGE_KEY, JSON.stringify(fetchedLimits))
+      localStorage.setItem(SENSOR_CONFIG_STORAGE_KEY, JSON.stringify(payload))
 
       if (!isCancelled) {
-        dispatch({ type: SENSOR_ACTIONS.SET_LIMITS, payload: fetchedLimits })
+        dispatch({ type: SENSOR_ACTIONS.SET_INITIAL_CONFIG, payload })
       }
     }
 
-    loadLimits().catch((error) => {
-      console.error('No se pudieron cargar límites iniciales:', error)
+    loadInitialConfig().catch((error) => {
+      console.error('No se pudo cargar la configuración inicial:', error)
     })
 
     return () => {
