@@ -32,6 +32,21 @@ header p {
   color: #1d4ed8;
 }
 
+.reload-button {
+  margin-top: 0.6rem;
+  border: 1px solid #0ea5e9;
+  background: #e0f2fe;
+  color: #0c4a6e;
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.reload-button:hover {
+  background: #bae6fd;
+}
+
 .grid {
   margin-top: 1.25rem;
   display: grid;

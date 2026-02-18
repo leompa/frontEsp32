@@ -1,94 +1,45 @@
-import { useEffect, useReducer } from 'react'
-import { SENSOR_CONFIG_STORAGE_KEY, SENSOR_CONFIG_URL, WS_URL } from '../config/sensorsConfig'
+import { useCallback, useEffect, useReducer } from 'react'
+import { SENSOR_POLL_INTERVAL_MS, SENSOR_POLL_URL } from '../config/sensorsConfig'
 import { initialSensorStore, sensorReducer, SENSOR_ACTIONS } from '../redux/sensorReducer'
 
 export function useSensorRealtime() {
   const [store, dispatch] = useReducer(sensorReducer, initialSensorStore)
 
-  useEffect(() => {
-    let isCancelled = false
+  const fetchSensors = useCallback(async () => {
+    try {
+      dispatch({ type: SENSOR_ACTIONS.SET_STATUS, payload: 'actualizando...' })
 
-    async function loadInitialConfig() {
-      const cached = localStorage.getItem(SENSOR_CONFIG_STORAGE_KEY)
-
-      if (cached) {
-        try {
-          const cachedConfig = JSON.parse(cached)
-          if (!isCancelled) {
-            dispatch({ type: SENSOR_ACTIONS.SET_INITIAL_CONFIG, payload: cachedConfig })
-          }
-          return
-        } catch (error) {
-          console.warn('Cache de configuración inválida, se recargará desde API:', error)
-        }
+      const response = await fetch(SENSOR_POLL_URL, { cache: 'no-store' })
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`)
       }
 
-      const response = await fetch(SENSOR_CONFIG_URL)
       const payload = await response.json()
-      localStorage.setItem(SENSOR_CONFIG_STORAGE_KEY, JSON.stringify(payload))
-
-      if (!isCancelled) {
-        dispatch({ type: SENSOR_ACTIONS.SET_INITIAL_CONFIG, payload })
-      }
-    }
-
-    loadInitialConfig().catch((error) => {
-      console.error('No se pudo cargar la configuración inicial:', error)
-    })
-
-    return () => {
-      isCancelled = true
+      dispatch({ type: SENSOR_ACTIONS.SET_SENSORS, payload })
+      dispatch({ type: SENSOR_ACTIONS.SET_STATUS, payload: 'en línea (polling)' })
+    } catch (error) {
+      dispatch({ type: SENSOR_ACTIONS.SET_STATUS, payload: 'error de carga' })
+      console.error('No se pudo actualizar sensores desde JSON:', error)
     }
   }, [])
 
   useEffect(() => {
-    let socket
-    let reconnectTimer
-    let unmounted = false
+    fetchSensors()
 
-    const connectSocket = () => {
-      dispatch({ type: SENSOR_ACTIONS.SET_STATUS, payload: 'conectando' })
-      socket = new WebSocket(WS_URL)
+    const timer = setInterval(() => {
+      fetchSensors()
+    }, SENSOR_POLL_INTERVAL_MS)
 
-      socket.onopen = () => {
-        if (!unmounted) {
-          dispatch({ type: SENSOR_ACTIONS.SET_STATUS, payload: 'en línea' })
-        }
-      }
+    return () => clearInterval(timer)
+  }, [fetchSensors])
 
-      socket.onmessage = (event) => {
-        try {
-          const payload = JSON.parse(event.data)
-          dispatch({ type: SENSOR_ACTIONS.APPLY_REALTIME, payload })
-        } catch (error) {
-          console.error('Mensaje WS inválido:', error)
-        }
-      }
+  const reloadSensors = useCallback(async () => {
+    dispatch({ type: SENSOR_ACTIONS.RESET_SENSORS })
+    await fetchSensors()
+  }, [fetchSensors])
 
-      socket.onerror = () => {
-        if (!unmounted) {
-          dispatch({ type: SENSOR_ACTIONS.SET_STATUS, payload: 'error' })
-        }
-      }
-
-      socket.onclose = () => {
-        if (!unmounted) {
-          dispatch({ type: SENSOR_ACTIONS.SET_STATUS, payload: 'reconectando...' })
-          reconnectTimer = setTimeout(connectSocket, 2000)
-        }
-      }
-    }
-
-    connectSocket()
-
-    return () => {
-      unmounted = true
-      if (reconnectTimer) clearTimeout(reconnectTimer)
-      if (socket && socket.readyState === WebSocket.OPEN) {
-        socket.close()
-      }
-    }
-  }, [])
-
-  return store
+  return {
+    ...store,
+    reloadSensors
+  }
 }
