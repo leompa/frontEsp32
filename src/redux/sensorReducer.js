@@ -27,6 +27,7 @@ export function sensorReducer(state, action) {
       return {
         ...state,
         sensors: {},
+        ...initialSensorStore,
         connectionStatus: 'recargando...'
       }
     default:
