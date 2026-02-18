@@ -1,0 +1,32 @@
+{
+  "sensor_1": {
+    "temperatura": 22.5,
+    "punto_minimo": 18,
+    "punto_maximo": 30,
+    "alarma": false
+  },
+  "sensor_2": {
+    "temperatura": 31.2,
+    "punto_minimo": 15,
+    "punto_maximo": 28,
+    "alarma": true
+  },
+  "sensor_3": {
+    "temperatura": 19.8,
+    "punto_minimo": 16,
+    "punto_maximo": 25,
+    "alarma": false
+  },
+  "sensor_4": {
+    "temperatura": 12.3,
+    "punto_minimo": 14,
+    "punto_maximo": 26,
+    "alarma": true
+  },
+  "sensor_5": {
+    "temperatura": 24.1,
+    "punto_minimo": 20,
+    "punto_maximo": 29,
+    "alarma": false
+  }
+}
