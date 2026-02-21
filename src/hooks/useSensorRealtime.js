@@ -15,7 +15,6 @@ export function useSensorRealtime() {
       dispatch({ type: SENSOR_ACTIONS.SET_STATUS, payload: 'actualizando...' })
 
       const response = await fetch(buildNoCacheUrl(SENSOR_POLL_URL), { cache: 'no-store' })
-      const response = await fetch(SENSOR_POLL_URL, { cache: 'no-store' })
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`)
       }
