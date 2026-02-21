@@ -16,7 +16,7 @@ export function sensorReducer(state, action) {
     case SENSOR_ACTIONS.SET_SENSORS:
       return {
         ...state,
-        sensors: buildSensorsFromConfig(action.payload)
+        sensors: buildSensorsFromConfig(action.payload, { useOnlyPayloadKeys: true })
       }
     case SENSOR_ACTIONS.SET_STATUS:
       return {
@@ -25,6 +25,8 @@ export function sensorReducer(state, action) {
       }
     case SENSOR_ACTIONS.RESET_SENSORS:
       return {
+        ...state,
+        sensors: {},
         ...initialSensorStore,
         connectionStatus: 'recargando...'
       }

@@ -38,9 +38,14 @@ export function toPercent(value, min, max) {
   return ((value - min) / (max - min)) * 100
 }
 
-export function buildSensorsFromConfig(configPayload = {}) {
+export function buildSensorsFromConfig(configPayload = {}, options = {}) {
   const nextSensors = {}
-  const sensorNames = new Set([...Object.keys(baseSensorData), ...Object.keys(configPayload || {})])
+  const hasPayload = configPayload && Object.keys(configPayload).length > 0
+  const useOnlyPayloadKeys = options.useOnlyPayloadKeys === true && hasPayload
+
+  const sensorNames = useOnlyPayloadKeys
+    ? Object.keys(configPayload)
+    : [...new Set([...Object.keys(baseSensorData), ...Object.keys(configPayload || {})])]
 
   for (const sensorName of sensorNames) {
     const baseSensor = baseSensorData[sensorName] || {}
@@ -49,22 +54,4 @@ export function buildSensorsFromConfig(configPayload = {}) {
   }
 
   return nextSensors
-}
-
-export function applyRealtimePayload(currentSensors, payload) {
-  const next = { ...currentSensors }
-
-  for (const [sensorName, update] of Object.entries(payload || {})) {
-    const current = next[sensorName] || {}
-    next[sensorName] = normalizeSensor(
-      {
-        ...current,
-        ...(hasNumeric(update.temperatura) ? { temperatura: update.temperatura } : {}),
-        ...(typeof update.alarma === 'boolean' ? { alarma: update.alarma } : {})
-      },
-      current
-    )
-  }
-
-  return next
 }

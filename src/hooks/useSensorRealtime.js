@@ -2,6 +2,11 @@ import { useCallback, useEffect, useReducer } from 'react'
 import { SENSOR_POLL_INTERVAL_MS, SENSOR_POLL_URL } from '../config/sensorsConfig'
 import { initialSensorStore, sensorReducer, SENSOR_ACTIONS } from '../redux/sensorReducer'
 
+function buildNoCacheUrl(url) {
+  const separator = url.includes('?') ? '&' : '?'
+  return `${url}${separator}t=${Date.now()}`
+}
+
 export function useSensorRealtime() {
   const [store, dispatch] = useReducer(sensorReducer, initialSensorStore)
 
@@ -9,6 +14,7 @@ export function useSensorRealtime() {
     try {
       dispatch({ type: SENSOR_ACTIONS.SET_STATUS, payload: 'actualizando...' })
 
+      const response = await fetch(buildNoCacheUrl(SENSOR_POLL_URL), { cache: 'no-store' })
       const response = await fetch(SENSOR_POLL_URL, { cache: 'no-store' })
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`)
