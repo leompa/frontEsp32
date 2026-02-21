@@ -3,6 +3,9 @@ import { playAlertTone } from '../utils/audioUtils'
 import { GLOBAL_MAX, GLOBAL_MIN } from '../config/sensorsConfig'
 import { clamp, toPercent } from '../utils/sensorUtils'
 
+const TEST_ALARM_DURATION_MS = 2000
+const TEST_ALARM_DURATION_SECONDS = TEST_ALARM_DURATION_MS / 1000
+
 export default function Gauge({ name, temperatura, punto_minimo, punto_maximo, alarma }) {
   const [isTestingAlarm, setIsTestingAlarm] = useState(false)
   const timeoutRef = useRef(null)
@@ -39,7 +42,7 @@ export default function Gauge({ name, temperatura, punto_minimo, punto_maximo, a
     timeoutRef.current = setTimeout(() => {
       setIsTestingAlarm(false)
       timeoutRef.current = null
-    }, 2000)
+    }, TEST_ALARM_DURATION_MS)
   }
 
   return (
@@ -63,7 +66,7 @@ export default function Gauge({ name, temperatura, punto_minimo, punto_maximo, a
       </p>
 
       <button type="button" className="test-button" onClick={triggerAlarmTest}>
-        Test alarma
+        Test alarma ({TEST_ALARM_DURATION_SECONDS} segundos)
       </button>
     </article>
   )

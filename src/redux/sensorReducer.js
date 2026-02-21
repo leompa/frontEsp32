@@ -1,32 +1,34 @@
-import { buildSensorsFromConfig, applyRealtimePayload } from '../utils/sensorUtils'
+import { buildSensorsFromConfig } from '../utils/sensorUtils'
 
 export const SENSOR_ACTIONS = {
-  SET_INITIAL_CONFIG: 'SET_INITIAL_CONFIG',
+  SET_SENSORS: 'SET_SENSORS',
   SET_STATUS: 'SET_STATUS',
-  APPLY_REALTIME: 'APPLY_REALTIME'
+  RESET_SENSORS: 'RESET_SENSORS'
 }
 
 export const initialSensorStore = {
   sensors: buildSensorsFromConfig(),
-  connectionStatus: 'conectando'
+  connectionStatus: 'inicializando'
 }
 
 export function sensorReducer(state, action) {
   switch (action.type) {
-    case SENSOR_ACTIONS.SET_INITIAL_CONFIG:
+    case SENSOR_ACTIONS.SET_SENSORS:
       return {
         ...state,
-        sensors: buildSensorsFromConfig(action.payload)
+        sensors: buildSensorsFromConfig(action.payload, { useOnlyPayloadKeys: true })
       }
     case SENSOR_ACTIONS.SET_STATUS:
       return {
         ...state,
         connectionStatus: action.payload
       }
-    case SENSOR_ACTIONS.APPLY_REALTIME:
+    case SENSOR_ACTIONS.RESET_SENSORS:
       return {
         ...state,
-        sensors: applyRealtimePayload(state.sensors, action.payload)
+        sensors: {},
+        ...initialSensorStore,
+        connectionStatus: 'recargando...'
       }
     default:
       return state
