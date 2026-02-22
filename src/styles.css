@@ -32,6 +32,68 @@ header p {
   color: #1d4ed8;
 }
 
+.reload-button {
+  margin-top: 0.6rem;
+  border: 1px solid #0ea5e9;
+  background: #e0f2fe;
+  color: #0c4a6e;
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.reload-button:hover {
+  background: #bae6fd;
+}
+
+
+.header-actions {
+  margin-top: 0.6rem;
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.general-test-button {
+  border: 1px solid #f59e0b;
+  background: #fef3c7;
+  color: #78350f;
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.general-test-button:hover {
+  background: #fde68a;
+}
+
+.history {
+  margin-top: 1.25rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.history h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: #334155;
+}
+
+.history-empty {
+  margin: 0;
+  color: #64748b;
+}
+
+.history-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: #334155;
+}
+
 .grid {
   margin-top: 1.25rem;
   display: grid;
